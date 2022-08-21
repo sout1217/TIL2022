@@ -34,12 +34,18 @@ public class Department {
      *        직원 데이터가 필요할 때만 조회하기 위해 지연로딩을 사용한다
      *
      * orphanRemoval : [기본값] false
-     *                 false 인 경우
+     *                 true 인 경우, 반드시 employee 가 존재해야 한다 (not null)
+     *
+     * CascadeType.PERSIST : employeeList 에 employee 가 추가 될 때, em.persist(Employee) 를 하지 않아도 자동으로 해줄 수 있다
      */
     @Builder.Default
-    @OneToMany(mappedBy = "dept", fetch = FetchType.LAZY, orphanRemoval = false)
+    @OneToMany(mappedBy = "dept", fetch = FetchType.LAZY, orphanRemoval = false, cascade = CascadeType.PERSIST)
     private List<Employee> employeeList = new ArrayList<>();
 
-
+    /** 연결관계 편의 메소드 */
+    public void addEmployee(Employee emp) {
+        this.employeeList.add(emp);
+        emp.refDept(this);
+    }
 }
 
