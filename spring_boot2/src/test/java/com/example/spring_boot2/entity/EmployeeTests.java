@@ -34,9 +34,11 @@ class EmployeeTests {
 
         Employee martin = Employee.builder()
                 .name("martin")
+                .dept(developTeam)
                 .build();
         Employee tom = Employee.builder()
                 .name("tom")
+                .dept(businessTeam)
                 .build();
         Employee benny = Employee.builder()
                 .name("benny")
@@ -66,6 +68,22 @@ class EmployeeTests {
 
         assertThat(department).isNotNull();
         assertThat(department.getName()).isEqualTo("영업부");
+
+    }
+
+    @Test
+    @DisplayName("[즉시로딩 - EAGER Loading] 다대일 단방향 매핑 테스트")
+    void test2() {
+        Employee employee = employeeRepository.findById(1L).orElse(null);
+
+        assertThat(employee).isNotNull();
+        assertThat(employee.getName()).isEqualTo("martin");
+        assertThat(employee.getDept().getName()).isEqualTo("개발부");
+
+        Department department = departmentRepository.findById(3L).orElse(null);
+
+        assertThat(department).isNotNull();
+        assertThat(department.getName()).isEqualTo("개발부");
 
     }
 }
