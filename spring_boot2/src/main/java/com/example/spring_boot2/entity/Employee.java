@@ -30,4 +30,9 @@ public class Employee {
         this.dept = dept;
         dept.getEmployeeList().add(this);
     }
+
+    /** 연결관계 끊기 **/
+    public void standbyDepartment() {
+        this.dept = null;
+    }
 }
