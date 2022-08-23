@@ -18,6 +18,4 @@ public class Employee {
 
     private String name;
 
-    @ManyToOne
-    private EmployeeCard employeeCard;
 }
