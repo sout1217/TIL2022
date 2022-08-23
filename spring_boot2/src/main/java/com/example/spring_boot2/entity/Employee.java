@@ -18,8 +18,4 @@ public class Employee {
 
     private String name;
 
-
-    @OneToOne
-    private EmployeeCard employeeCard;
-
 }

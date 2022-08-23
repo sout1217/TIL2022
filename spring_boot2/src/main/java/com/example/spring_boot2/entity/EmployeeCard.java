@@ -3,10 +3,7 @@ package com.example.spring_boot2.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,5 +22,6 @@ public class EmployeeCard {
 
     private String role;
 
-
+    @OneToOne
+    private Employee employee;
 }
