@@ -30,53 +30,56 @@ class EmployeeTests {
     @BeforeEach
     void dataInsert() {
 
-        Employee martin = Employee.builder()
-                .name("martin")
-                .build();
-        Employee tom = Employee.builder()
-                .name("tom")
-                .build();
-        Employee benny = Employee.builder()
-                .name("benny")
-                .build();
-        Employee kevin = Employee.builder()
-                .name("kevin")
-                .build();
 
         EmployeeCard martinCard = EmployeeCard.builder()
-                .employee(martin)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
         EmployeeCard tomCard = EmployeeCard.builder()
-                .employee(tom)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
         EmployeeCard bennyCard = EmployeeCard.builder()
-                .employee(benny)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
         EmployeeCard kevinCard = EmployeeCard.builder()
-                .employee(kevin)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
+
+        Employee martin = Employee.builder()
+                .employeeCard(martinCard)
+                .name("martin")
+                .build();
+        Employee tom = Employee.builder()
+                .employeeCard(martinCard)
+                .name("tom")
+                .build();
+        Employee benny = Employee.builder()
+                .employeeCard(tomCard)
+                .name("benny")
+                .build();
+        Employee kevin = Employee.builder()
+                .employeeCard(martinCard)
+                .name("kevin")
+                .build();
+
 
 
         /**
          * 저장순서가 중요하다
          */
+        employeeCardRepository.save(martinCard);
+        employeeCardRepository.save(tomCard);
+        employeeCardRepository.save(bennyCard);
+        employeeCardRepository.save(kevinCard);
+
         employeeRepository.save(martin);
         employeeRepository.save(tom);
         employeeRepository.save(benny);
         employeeRepository.save(kevin);
 
-        employeeCardRepository.save(martinCard);
-        employeeCardRepository.save(tomCard);
-        employeeCardRepository.save(bennyCard);
-        employeeCardRepository.save(kevinCard);
 
 
 
@@ -86,11 +89,12 @@ class EmployeeTests {
     void test() {
         EntityManager em = emf.createEntityManager();
 
-        EmployeeCard employeeCard = em.find(EmployeeCard.class, 1L);
+        Employee martin = em.find(Employee.class, 1L);
+        Employee tom = em.find(Employee.class, 2L);
 
-        assertThat(employeeCard.getRole()).isEqualTo("ROLE_USER");
-        assertThat(employeeCard.getExpireDate()).isAfter(LocalDateTime.of(2022, 6, 23, 23, 0, 0));
-        assertThat(employeeCard.getEmployee().getName()).isEqualTo("martin");
+        assertThat(martin.getName()).isEqualTo("martin");
+        assertThat(martin.getEmployeeCard().getId()).isEqualTo(1L);
+        assertThat(tom.getEmployeeCard().getId()).isEqualTo(1L);
 
         em.close();
     }

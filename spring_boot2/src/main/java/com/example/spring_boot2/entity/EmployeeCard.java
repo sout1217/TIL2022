@@ -22,6 +22,4 @@ public class EmployeeCard {
 
     private String role;
 
-    @OneToOne
-    private Employee employee;
 }
