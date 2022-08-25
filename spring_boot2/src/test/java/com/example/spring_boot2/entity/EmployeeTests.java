@@ -3,6 +3,7 @@ package com.example.spring_boot2.entity;
 import com.example.spring_boot2.repository.EmployeeCardRepository;
 import com.example.spring_boot2.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,50 +50,56 @@ class EmployeeTests {
                 .role("ROLE_USER")
                 .build();
         EmployeeCard tomCard = EmployeeCard.builder()
-                .employee(martin)
-                .expireDate(LocalDateTime.now())
-                .role("ROLE_USER")
-                .build();
-        EmployeeCard bennyCard = EmployeeCard.builder()
                 .employee(tom)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
+        EmployeeCard bennyCard = EmployeeCard.builder()
+                .employee(benny)
+                .expireDate(LocalDateTime.now())
+                .role("ROLE_USER")
+                .build();
         EmployeeCard kevinCard = EmployeeCard.builder()
-                .employee(martin)
+                .employee(kevin)
                 .expireDate(LocalDateTime.now())
                 .role("ROLE_USER")
                 .build();
 
-
-
-
-        /**
-         * 저장순서가 중요하다
-         */
-        employeeRepository.save(martin);
-        employeeRepository.save(tom);
-        employeeRepository.save(benny);
-        employeeRepository.save(kevin);
-
+        // cascade.PERSIST 로 emp 도 같이 저장되도록 함
         employeeCardRepository.save(martinCard);
         employeeCardRepository.save(tomCard);
         employeeCardRepository.save(bennyCard);
         employeeCardRepository.save(kevinCard);
 
+        /**
+         * EmployeeCard Table
+         * [이론적인 컬럼] id, expire_date, role, emp_id
+         * [실제 저장되는 컬럼] emp_id, expire_date, role
+         * @JoinColumn 으로 참조키를 명시하고,
+         * @MapsId 로 참조키 이면서, 기본키다라고 명시하였다.
+         * @Id id 가 적혀있음에도 실제 테이블에는 EmployeeCard id 컬럼은 존재하지 않는다.
+         *
+         * Employee Table
+         * id, name
+         */
+
     }
 
+    /**
+     *  영속성 컨텍스트에서 조회한 경우에는 같은 인스턴스를 반환한다 (sql mapper 는 new instance 로 == 비교가 안된다)
+     */
     @Test
+    @DisplayName("@MapsId Employee employee 필드 값 설정 시, employee.id 값이 employeeCard.id 값으로 들어가진다")
     void test() {
         EntityManager em = emf.createEntityManager();
 
-        EmployeeCard employeeCard1 = em.find(EmployeeCard.class, 1L);
-        EmployeeCard employeeCard2 = em.find(EmployeeCard.class, 2L);
-        EmployeeCard employeeCard3 = em.find(EmployeeCard.class, 4L);
+        Employee employee = em.find(Employee.class, 1L);
+        EmployeeCard employeeCard = em.find(EmployeeCard.class, employee.getId());
 
-        assertThat(employeeCard1.getEmployee().getName()).isEqualTo("martin");
-        assertThat(employeeCard2.getEmployee().getName()).isEqualTo("martin");
-        assertThat(employeeCard3.getEmployee().getName()).isEqualTo("martin");
+        assertThat(employeeCard.getId()).isEqualTo(employee.getId());
+        assertThat(employeeCard.getId()).isEqualTo(employeeCard.getEmployee().getId());
+        assertThat(employee == employeeCard.getEmployee()).isTrue();
+        assertThat(employeeCard.getEmployee().getName()).isEqualTo("martin");
 
         em.close();
     }
